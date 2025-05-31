@@ -5,28 +5,32 @@ using Unity.MLAgents.Sensors;
 
 public class Agente2Script : Agent
 {
+    public static event System.Action<Agente2Script> OnAgente2Atrapado;
+
     [SerializeField] private Transform _agente1;
     [SerializeField] private float _moveSpeed = 1.5f;
     [SerializeField] private float _rotationSpeed = 180f;
     [SerializeField] private gameManagerScript gameManager;
 
     private Renderer _renderer;
-    private int _currentEpisode = 0;
-    private float _cumulativeReward = 0f;
+    private int _episodesWon = 0;
+    private int _episodesTotal = 0;
+    private bool fueAtrapado = false;
+
+    public int EpisodesWon => _episodesWon;
+    public int EpisodesTotal => _episodesTotal;
 
     public override void Initialize()
     {
         _renderer = GetComponent<Renderer>();
-        _currentEpisode = 0;
-        _cumulativeReward = 0f;
     }
 
     public override void OnEpisodeBegin()
     {
-        _currentEpisode++;
-        _cumulativeReward = 0f;
-        _renderer.material.color = Color.yellow;
-
+        _episodesTotal++;
+        fueAtrapado = false;
+        if (_renderer != null)
+            _renderer.material.color = Color.yellow;
         if (gameManager != null)
             gameManager.SpawnAgents();
     }
@@ -35,10 +39,8 @@ public class Agente2Script : Agent
     {
         float agente1PosX_normalized = _agente1.localPosition.x / 5f;
         float agente1PosZ_normalized = _agente1.localPosition.z / 5f;
-
         float agente2PosX_normalized = transform.localPosition.x / 5f;
         float agente2PosZ_normalized = transform.localPosition.z / 5f;
-
         float agente2Rotation_normalized = (transform.localRotation.eulerAngles.y / 360f) * 2f - 1f;
 
         sensor.AddObservation(agente1PosX_normalized);
@@ -51,13 +53,18 @@ public class Agente2Script : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         MoveAgent(actions.DiscreteActions);
-
         AddReward(-2f / MaxStep);
 
         float distance = Vector3.Distance(transform.localPosition, _agente1.localPosition);
         AddReward(0.01f * distance);
 
-        _cumulativeReward = GetCumulativeReward();
+        if (StepCount >= MaxStep - 1 && !fueAtrapado)
+        {
+            AddWin();
+            AddReward(1.0f);
+            Debug.Log("Agente2 ganó el episodio (sobrevivió)");
+            EndEpisode();
+        }
     }
 
     public void MoveAgent(ActionSegment<int> act)
@@ -76,40 +83,36 @@ public class Agente2Script : Agent
                 break;
         }
     }
-    private void Agente1Caught()
+
+    public void NotificarAtrapado()
     {
+        fueAtrapado = true;
         AddReward(-1.0f);
-        _cumulativeReward = GetCumulativeReward();
+        Debug.Log("Agente2 fue atrapado por Agente1");
+        OnAgente2Atrapado?.Invoke(this); // Notifica a los suscriptores
         EndEpisode();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Agente1"))
-        {
-            Agente1Caught();
-        }
-
-        AddReward(-0.05f);
-        if (_renderer != null)
-        {
-            _renderer.material.color = Color.red;
-        }
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            AddReward(-0.01f * Time.deltaTime);
+            if (_renderer != null)
+                _renderer.material.color = Color.red;
         }
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (_renderer != null)
+        if (collision.gameObject.CompareTag("Wall"))
         {
-            _renderer.material.color = Color.yellow;
+            if (_renderer != null)
+                _renderer.material.color = Color.yellow;
         }
+    }
+
+    public void AddWin()
+    {
+        _episodesWon++;
     }
 }

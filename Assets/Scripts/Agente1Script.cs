@@ -2,48 +2,44 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
-using System.Transactions;
+
 public class Agente1Script : Agent
 {
-
     [SerializeField] private Transform _agente2;
     [SerializeField] private float _moveSpeed = 1.5f;
     [SerializeField] private float _rotationSpeed = 180f;
     [SerializeField] private gameManagerScript gameManager;
+    [SerializeField] private HUDManager hudManager;
 
     private Renderer _renderer;
+    private int _episodesWon = 0;
+    private int _episodesTotal = 0;
 
-    private int _currentEpisode = 0;
-    private float _cumulativeReward = 0f;
+    public int EpisodesWon => _episodesWon;
+    public int EpisodesTotal => _episodesTotal;
+
     public override void Initialize()
     {
-        Debug.Log("Initialize");
-
         _renderer = GetComponent<Renderer>();
-        _currentEpisode = 0;
-        _cumulativeReward = 0f;
     }
 
     public override void OnEpisodeBegin()
     {
-        Debug.Log("OnEpisodeBegin()");
-
-        _currentEpisode++;
-        _cumulativeReward = 0f;
-        _renderer.material.color = Color.blue;
-
+        _episodesTotal++;
+        if (_renderer != null)
+            _renderer.material.color = Color.blue;
         if (gameManager != null)
             gameManager.SpawnAgents();
+        if (hudManager != null)
+            hudManager.OnEpisodeBegin();
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
         float agente2PosX_normalized = _agente2.localPosition.x / 5f;
         float agente2PosZ_normalized = _agente2.localPosition.z / 5f;
-
         float agente1PosX_normalized = transform.localPosition.x / 5f;
         float agente1PosZ_normalized = transform.localPosition.z / 5f;
-
         float agente1Rotation_normalized = (transform.localRotation.eulerAngles.y / 360f) * 2f - 1f;
 
         sensor.AddObservation(agente2PosX_normalized);
@@ -53,20 +49,15 @@ public class Agente1Script : Agent
         sensor.AddObservation(agente1Rotation_normalized);
     }
 
-
     public override void OnActionReceived(ActionBuffers actions)
     {
         MoveAgent(actions.DiscreteActions);
-
         AddReward(-2f / MaxStep);
-
-        _cumulativeReward = GetCumulativeReward();
     }
 
     public void MoveAgent(ActionSegment<int> act)
     {
         var action = act[0];
-
         switch (action)
         {
             case 1:
@@ -80,11 +71,32 @@ public class Agente1Script : Agent
                 break;
         }
     }
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        Agente2Script.OnAgente2Atrapado += OnAgente2Atrapado;
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        Agente2Script.OnAgente2Atrapado -= OnAgente2Atrapado;
+    }
+
+    private void OnAgente2Atrapado(Agente2Script agente2)
+    {
+        AddWin();
+        Debug.Log("Agente1 atrapó a Agente2 (evento)");
+    }
+
     private void Agente2Reached()
     {
         AddReward(1.0f);
-        _cumulativeReward = GetCumulativeReward();
-
+        Debug.Log("Agente1 atrapó a Agente2");
+        // Ya no llamamos AddWin aquí, lo hace el evento
+        if (_agente2 != null && _agente2.TryGetComponent<Agente2Script>(out var script))
+            script.NotificarAtrapado();
         EndEpisode();
     }
 
@@ -92,14 +104,18 @@ public class Agente1Script : Agent
     {
         if (collision.gameObject.CompareTag("Agente2"))
         {
+            if (collision.gameObject.TryGetComponent<Agente2Script>(out var script))
+                script.NotificarAtrapado();
             Agente2Reached();
         }
 
-        AddReward(-0.05f);
-        if (_renderer != null)
+        if (collision.gameObject.CompareTag("Wall"))
         {
-            _renderer.material.color = Color.red;
+            if (_renderer != null)
+                _renderer.material.color = Color.red;
         }
+
+        AddReward(-0.05f);
     }
 
     private void OnCollisionStay(Collision collision)
@@ -112,10 +128,15 @@ public class Agente1Script : Agent
 
     private void OnCollisionExit(Collision collision)
     {
-        if (_renderer != null)
+        if (collision.gameObject.CompareTag("Wall"))
         {
-            _renderer.material.color = Color.blue;
+            if (_renderer != null)
+                _renderer.material.color = Color.blue;
         }
     }
 
+    public void AddWin()
+    {
+        _episodesWon++;
+    }
 }
