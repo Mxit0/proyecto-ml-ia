@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Scripts\gameManagerScript.cs" />
     <Compile Include="Assets\Scripts\Agente2Script.cs" />
     <Compile Include="Assets\Scripts\Agente1Script.cs" />
   </ItemGroup>

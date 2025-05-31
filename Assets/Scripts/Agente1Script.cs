@@ -9,6 +9,7 @@ public class Agente1Script : Agent
     [SerializeField] private Transform _agente2;
     [SerializeField] private float _moveSpeed = 1.5f;
     [SerializeField] private float _rotationSpeed = 180f;
+    [SerializeField] private gameManagerScript gameManager;
 
     private Renderer _renderer;
 
@@ -31,23 +32,10 @@ public class Agente1Script : Agent
         _cumulativeReward = 0f;
         _renderer.material.color = Color.blue;
 
-        SpawnObjects();
+        if (gameManager != null)
+            gameManager.SpawnAgents();
     }
 
-    private void SpawnObjects()
-    {
-        transform.localRotation = Quaternion.identity;
-        transform.localPosition = new Vector3(0f, 0.15f, 0f);
-
-        float randomAngle = Random.Range(0f, 360f);
-        Vector3 randomDirection = Quaternion.Euler(0f, randomAngle, 0f) * Vector3.forward;
-
-        float randomDistance = Random.Range(1f, 2.5f);
-
-        Vector3 agente2Position = transform.localPosition + randomDirection * randomDistance;
-
-        _agente2.localPosition = new Vector3(agente2Position.x, 0.3f, agente2Position.z);
-    }
     public override void CollectObservations(VectorSensor sensor)
     {
         float agente2PosX_normalized = _agente2.localPosition.x / 5f;
@@ -92,15 +80,6 @@ public class Agente1Script : Agent
                 break;
         }
     }
-
-    private void OTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Agente2"))
-        {
-            Agente2Reached();
-        }
-    }
-
     private void Agente2Reached()
     {
         AddReward(1.0f);
@@ -111,15 +90,19 @@ public class Agente1Script : Agent
 
     private void OnCollisionEnter(Collision collision)
     {
-        AddReward(-0.05f);
+        if (collision.gameObject.CompareTag("Agente2"))
+        {
+            Agente2Reached();
+        }
 
+        AddReward(-0.05f);
         if (_renderer != null)
         {
             _renderer.material.color = Color.red;
         }
     }
 
-    private void OnColisionStay(Collision collision)
+    private void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
@@ -127,7 +110,7 @@ public class Agente1Script : Agent
         }
     }
 
-    private void OnColisionExit(Collision collision)
+    private void OnCollisionExit(Collision collision)
     {
         if (_renderer != null)
         {
