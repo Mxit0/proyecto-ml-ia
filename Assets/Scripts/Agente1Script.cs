@@ -64,6 +64,7 @@ public class Agente1Script : Agent
         if (_gameManager != null)
             _gameManager.SpawnAgents();
 
+        // SOLO Agente1 llama al HUD para el tiempo y episodios
         if (hudManager != null)
             hudManager.OnEpisodeBegin();
     }
@@ -174,6 +175,7 @@ public class Agente1Script : Agent
     {
         AddWin();
         Debug.Log("Agente1 atrapó a Agente2 (evento)");
+        OnAgente1Gano?.Invoke();
     }
 
     /// <summary>
@@ -244,4 +246,6 @@ public class Agente1Script : Agent
     {
         _episodesWon++;
     }
+
+    public static event System.Action OnAgente1Gano;
 }

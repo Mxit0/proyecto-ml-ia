@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections;
 /// <summary>
 /// Clase encargada de gestionar la ubicación inicial de los agentes en la escena.
 /// </summary>
@@ -14,6 +14,59 @@ public class gameManagerScript : MonoBehaviour
     /// Componente Transform del Agente2 (generalmente el perseguido).
     /// </summary>
     public Transform agente2;
+
+    [Header("Renderer del suelo")]
+    public Renderer groundRenderer;
+
+    private Material groundMaterial;
+    private Coroutine glowCoroutine;
+    private Color baseColor;
+
+    void Awake()
+    {
+        if (groundRenderer != null)
+        {
+            groundMaterial = groundRenderer.material;
+            baseColor = groundMaterial.GetColor("_EmissionColor");
+        }
+    }
+
+    /// <summary>
+    /// Llama este método para hacer el glow del suelo.
+    /// </summary>
+    public void PlayGroundGlow(Color color, float glowIntensity = 2.5f, float glowTime = 0.3f, float fadeTime = 0.4f)
+    {
+        if (glowCoroutine != null)
+            StopCoroutine(glowCoroutine);
+        glowCoroutine = StartCoroutine(GroundGlowCoroutine(color, glowIntensity, glowTime, fadeTime));
+    }
+
+    private IEnumerator GroundGlowCoroutine(Color color, float intensity, float glowTime, float fadeTime)
+    {
+        if (groundMaterial == null) yield break;
+
+        // Glow fuerte
+        groundMaterial.SetColor("_EmissionColor", color * intensity);
+        DynamicGI.SetEmissive(groundRenderer, color * intensity);
+
+        yield return new WaitForSeconds(glowTime);
+
+        // Desvanecer suavemente
+        float t = 0f;
+        Color startEmission = color * intensity;
+        while (t < fadeTime)
+        {
+            t += Time.deltaTime;
+            Color faded = Color.Lerp(startEmission, baseColor, t / fadeTime);
+            groundMaterial.SetColor("_EmissionColor", faded);
+            DynamicGI.SetEmissive(groundRenderer, faded);
+            yield return null;
+        }
+
+        // Restaurar color base
+        groundMaterial.SetColor("_EmissionColor", baseColor);
+        DynamicGI.SetEmissive(groundRenderer, baseColor);
+    }
 
     /// <summary>
     /// Método para posicionar ambos agentes al inicio de un episodio.
@@ -42,5 +95,34 @@ public class gameManagerScript : MonoBehaviour
 
         // Coloca Agente2 con rotación neutra
         agente2.localRotation = Quaternion.identity;
+
+        /*
+        if (groundRenderer != null)
+        {
+            baseColor = groundMaterial.GetColor("_EmissionColor");
+        }
+        */
+    }
+
+    private void OnEnable()
+    {
+        Agente1Script.OnAgente1Gano += OnAgente1Gano;
+        Agente2Script.OnAgente2Gano += OnAgente2Gano;
+    }
+
+    private void OnDisable()
+    {
+        Agente1Script.OnAgente1Gano -= OnAgente1Gano;
+        Agente2Script.OnAgente2Gano -= OnAgente2Gano;
+    }
+
+    private void OnAgente1Gano()
+    {
+        PlayGroundGlow(Color.blue);
+    }
+
+    private void OnAgente2Gano()
+    {
+        PlayGroundGlow(Color.yellow);
     }
 }

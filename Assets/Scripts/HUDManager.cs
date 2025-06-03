@@ -56,14 +56,10 @@ public class HUDManager : MonoBehaviour
     /// </summary>
     void Update()
     {
-        // Calcula el total de episodios promedio entre ambos agentes
-        int totalEpisodes = (agente1.EpisodesTotal + agente2.EpisodesTotal) / 2;
+        int totalEpisodes = agente1.EpisodesTotal;
 
-        // Calcula duración del episodio actual
         float episodeDuration = Time.time - episodeStartTime;
-
-        // Calcula tiempo total promedio de entrenamiento incluyendo episodio actual
-        float totalTrainingTime = (trainingTotalTime + episodeDuration) / 2f;
+        float totalTrainingTime = trainingTotalTime + episodeDuration;
 
         // --- Información Agente 1 ---
         float reward1 = agente1.GetCumulativeReward(); // recompensa acumulada actual

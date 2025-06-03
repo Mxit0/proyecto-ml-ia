@@ -13,6 +13,7 @@ public class Agente2Script : Agent
     /// Evento que notifica cuando el agente 2 ha sido atrapado.
     /// </summary>
     public static event System.Action<Agente2Script> OnAgente2Atrapado;
+    public static event System.Action OnAgente2Gano;
 
     [SerializeField]
     [Tooltip("Referencia al transform del agente 1 para obtener su posición.")]
@@ -59,13 +60,15 @@ public class Agente2Script : Agent
     /// </summary>
     public override void OnEpisodeBegin()
     {
-        _episodesTotal++;
+        _episodesTotal++; // Solo para estadísticas internas de Agente2
         fueAtrapado = false;
         if (_renderer != null)
             _renderer.material.color = Color.yellow;
 
         if (gameManager != null)
             gameManager.SpawnAgents();
+
+        // NO LLAMES a hudManager.OnEpisodeBegin() aquí
     }
 
     /// <summary>
@@ -131,6 +134,7 @@ public class Agente2Script : Agent
             AddWin();
             AddReward(1.0f);
             Debug.Log("Agente2 ganó el episodio (sobrevivió)");
+            OnAgente2Gano?.Invoke();
             EndEpisode();
         }
     }
