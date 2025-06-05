@@ -1,45 +1,45 @@
 {
-    "Agente1": {
-        "checkpoints": [
-            {
-                "steps": 20521,
-                "file_path": "results\\prueba0\\Agente1\\Agente1-20521.onnx",
-                "reward": null,
-                "creation_time": 1749093888.751973,
-                "auxillary_file_paths": [
-                    "results\\prueba0\\Agente1\\Agente1-20521.pt"
-                ]
-            }
-        ],
-        "final_checkpoint": {
-            "steps": 20521,
-            "file_path": "results\\prueba0\\Agente1.onnx",
-            "reward": null,
-            "creation_time": 1749093888.751973,
-            "auxillary_file_paths": [
-                "results\\prueba0\\Agente1\\Agente1-20521.pt"
-            ]
-        }
-    },
     "Agente2": {
         "checkpoints": [
             {
-                "steps": 20521,
-                "file_path": "results\\prueba0\\Agente2\\Agente2-20521.onnx",
+                "steps": 20691,
+                "file_path": "results\\prueba0\\Agente2\\Agente2-20691.onnx",
                 "reward": null,
-                "creation_time": 1749093889.0003521,
+                "creation_time": 1749094075.860787,
                 "auxillary_file_paths": [
-                    "results\\prueba0\\Agente2\\Agente2-20521.pt"
+                    "results\\prueba0\\Agente2\\Agente2-20691.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 20521,
+            "steps": 20691,
             "file_path": "results\\prueba0\\Agente2.onnx",
             "reward": null,
-            "creation_time": 1749093889.0003521,
+            "creation_time": 1749094075.860787,
             "auxillary_file_paths": [
-                "results\\prueba0\\Agente2\\Agente2-20521.pt"
+                "results\\prueba0\\Agente2\\Agente2-20691.pt"
+            ]
+        }
+    },
+    "Agente1": {
+        "checkpoints": [
+            {
+                "steps": 20691,
+                "file_path": "results\\prueba0\\Agente1\\Agente1-20691.onnx",
+                "reward": null,
+                "creation_time": 1749094076.1057687,
+                "auxillary_file_paths": [
+                    "results\\prueba0\\Agente1\\Agente1-20691.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 20691,
+            "file_path": "results\\prueba0\\Agente1.onnx",
+            "reward": null,
+            "creation_time": 1749094076.1057687,
+            "auxillary_file_paths": [
+                "results\\prueba0\\Agente1\\Agente1-20691.pt"
             ]
         }
     },
