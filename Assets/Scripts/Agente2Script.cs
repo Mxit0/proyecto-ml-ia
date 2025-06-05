@@ -129,15 +129,14 @@ public class Agente2Script : Agent
         float distance = Vector3.Distance(transform.localPosition, _agente1.localPosition);
         AddReward(0.01f * distance);
 
-        // Ejemplo: Si el agente 2 gana por sobrevivir
+        // Si el agente 2 gana por sobrevivir
         if (StepCount >= MaxStep - 1 && !fueAtrapado)
         {
-            AddWin();
+            AddWin(); // SOLO Agente2 suma victoria aquí
             AddReward(1.0f);
             Debug.Log("Agente2 ganó el episodio (sobrevivió)");
             if (_gameManager != null)
-                _gameManager.OnAgente2Gano(); // <-- ¡AQUÍ!
-            EndEpisode();
+                _gameManager.OnAgente2Gano();
         }
     }
 
@@ -173,8 +172,10 @@ public class Agente2Script : Agent
         fueAtrapado = true;
         AddReward(-1.0f);
         Debug.Log("Agente2 fue atrapado por Agente1");
-        OnAgente2Atrapado?.Invoke(this); // Notifica a los suscriptores del evento
-        EndEpisode();
+        OnAgente2Atrapado?.Invoke(this);
+        if (_gameManager != null)
+            _gameManager.OnAgente1Gano();
+        // NO LLAMES a AddWin() aquí
     }
 
     /// <summary>

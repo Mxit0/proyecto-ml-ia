@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Unity.MLAgents; // <-- Agrega esta línea
 /// <summary>
 /// Clase encargada de gestionar la ubicación inicial de los agentes en la escena.
 /// </summary>
@@ -120,10 +121,14 @@ public class gameManagerScript : MonoBehaviour
     public void OnAgente1Gano()
     {
         PlayGroundGlow(Color.blue);
+        if (agente1.TryGetComponent<Agent>(out var a1)) a1.EndEpisode();
+        if (agente2.TryGetComponent<Agent>(out var a2)) a2.EndEpisode();
     }
 
     public void OnAgente2Gano()
     {
         PlayGroundGlow(Color.yellow);
+        if (agente1.TryGetComponent<Agent>(out var a1)) a1.EndEpisode();
+        if (agente2.TryGetComponent<Agent>(out var a2)) a2.EndEpisode();
     }
 }

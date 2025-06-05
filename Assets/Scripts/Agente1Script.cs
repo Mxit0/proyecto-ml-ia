@@ -146,14 +146,13 @@ public class Agente1Script : Agent
     /// </summary>
     private void Agente2Reached()
     {
+        AddWin(); // SOLO Agente1 suma victoria aquí
         AddReward(1.0f);
         Debug.Log("Agente1 atrapó a Agente2");
         if (_agente2 != null && _agente2.TryGetComponent<Agente2Script>(out var script))
             script.NotificarAtrapado();
-        // Glow solo en el ambiente correspondiente
         if (_gameManager != null)
             _gameManager.OnAgente1Gano();
-        EndEpisode();
     }
 
     /// <summary>
