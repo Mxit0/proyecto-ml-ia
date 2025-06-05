@@ -26,7 +26,8 @@ public class gameManagerScript : MonoBehaviour
     {
         if (groundRenderer != null)
         {
-            groundMaterial = groundRenderer.material;
+            // Esto fuerza a que cada instancia tenga su propio material
+            groundMaterial = groundRenderer.material = new Material(groundRenderer.material);
             baseColor = groundMaterial.GetColor("_EmissionColor");
         }
     }
@@ -103,7 +104,7 @@ public class gameManagerScript : MonoBehaviour
         }
         */
     }
-
+    /*
     private void OnEnable()
     {
         Agente1Script.OnAgente1Gano += OnAgente1Gano;
@@ -115,13 +116,13 @@ public class gameManagerScript : MonoBehaviour
         Agente1Script.OnAgente1Gano -= OnAgente1Gano;
         Agente2Script.OnAgente2Gano -= OnAgente2Gano;
     }
-
-    private void OnAgente1Gano()
+    */
+    public void OnAgente1Gano()
     {
         PlayGroundGlow(Color.blue);
     }
 
-    private void OnAgente2Gano()
+    public void OnAgente2Gano()
     {
         PlayGroundGlow(Color.yellow);
     }

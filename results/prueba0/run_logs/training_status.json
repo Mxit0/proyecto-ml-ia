@@ -1,4 +1,48 @@
 {
+    "Agente2": {
+        "checkpoints": [
+            {
+                "steps": 8404,
+                "file_path": "results\\prueba0\\Agente2\\Agente2-8404.onnx",
+                "reward": 217.35532426834106,
+                "creation_time": 1749084923.542266,
+                "auxillary_file_paths": [
+                    "results\\prueba0\\Agente2\\Agente2-8404.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 8404,
+            "file_path": "results\\prueba0\\Agente2.onnx",
+            "reward": 217.35532426834106,
+            "creation_time": 1749084923.542266,
+            "auxillary_file_paths": [
+                "results\\prueba0\\Agente2\\Agente2-8404.pt"
+            ]
+        }
+    },
+    "Agente1": {
+        "checkpoints": [
+            {
+                "steps": 8404,
+                "file_path": "results\\prueba0\\Agente1\\Agente1-8404.onnx",
+                "reward": -2.2953196465969086,
+                "creation_time": 1749084923.6474216,
+                "auxillary_file_paths": [
+                    "results\\prueba0\\Agente1\\Agente1-8404.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 8404,
+            "file_path": "results\\prueba0\\Agente1.onnx",
+            "reward": -2.2953196465969086,
+            "creation_time": 1749084923.6474216,
+            "auxillary_file_paths": [
+                "results\\prueba0\\Agente1\\Agente1-8404.pt"
+            ]
+        }
+    },
     "metadata": {
         "stats_format_version": "0.3.0",
         "mlagents_version": "1.1.0",

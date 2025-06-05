@@ -29,7 +29,7 @@ public class Agente2Script : Agent
 
     [SerializeField]
     [Tooltip("Referencia al script del gestor del juego para reiniciar agentes.")]
-    private gameManagerScript gameManager;
+    private gameManagerScript _gameManager;
 
     private Renderer _renderer; // Renderer para cambiar el color del agente
     private int _episodesWon = 0; // Número de episodios ganados
@@ -65,8 +65,8 @@ public class Agente2Script : Agent
         if (_renderer != null)
             _renderer.material.color = Color.yellow;
 
-        if (gameManager != null)
-            gameManager.SpawnAgents();
+        if (_gameManager != null)
+            _gameManager.SpawnAgents();
 
         // NO LLAMES a hudManager.OnEpisodeBegin() aquí
     }
@@ -127,14 +127,16 @@ public class Agente2Script : Agent
         AddReward(-2f / MaxStep);
 
         float distance = Vector3.Distance(transform.localPosition, _agente1.localPosition);
-        AddReward(0.01f * distance); // Recompensa por alejarse del agente1
+        AddReward(0.01f * distance);
 
+        // Ejemplo: Si el agente 2 gana por sobrevivir
         if (StepCount >= MaxStep - 1 && !fueAtrapado)
         {
             AddWin();
             AddReward(1.0f);
             Debug.Log("Agente2 ganó el episodio (sobrevivió)");
-            OnAgente2Gano?.Invoke();
+            if (_gameManager != null)
+                _gameManager.OnAgente2Gano(); // <-- ¡AQUÍ!
             EndEpisode();
         }
     }

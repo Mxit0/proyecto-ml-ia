@@ -25,10 +25,6 @@ public class Agente1Script : Agent
     [Tooltip("Referencia al script del gestor del juego para reiniciar agentes.")]
     private gameManagerScript _gameManager;
 
-    [SerializeField]
-    [Tooltip("Referencia al gestor de la interfaz HUD para actualizar visualmente los episodios.")]
-    private HUDManager hudManager;
-
     private Renderer _renderer;  // Renderer para cambiar el color del agente
     private int _episodesWon = 0; // Número de episodios ganados
     private int _episodesTotal = 0; // Número total de episodios jugados
@@ -63,10 +59,6 @@ public class Agente1Script : Agent
 
         if (_gameManager != null)
             _gameManager.SpawnAgents();
-
-        // SOLO Agente1 llama al HUD para el tiempo y episodios
-        if (hudManager != null)
-            hudManager.OnEpisodeBegin();
     }
 
     /// <summary>
@@ -149,36 +141,6 @@ public class Agente1Script : Agent
     }
 
     /// <summary>
-    /// Se suscribe al evento cuando el Agente2 es atrapado.
-    /// </summary>
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        Agente2Script.OnAgente2Atrapado += OnAgente2Atrapado;
-    }
-
-    /// <summary>
-    /// Se desuscribe del evento al deshabilitarse el agente.
-    /// </summary>
-    protected override void OnDisable()
-    {
-        base.OnDisable();
-        Agente2Script.OnAgente2Atrapado -= OnAgente2Atrapado;
-    }
-
-    /// <summary>
-    /// Callback que se ejecuta cuando el agente 2 es atrapado.
-    /// Suma una victoria y muestra mensaje en consola.
-    /// </summary>
-    /// <param name="agente2">Referencia al agente 2 atrapado.</param>
-    private void OnAgente2Atrapado(Agente2Script agente2)
-    {
-        AddWin();
-        Debug.Log("Agente1 atrapó a Agente2 (evento)");
-        OnAgente1Gano?.Invoke();
-    }
-
-    /// <summary>
     /// Método que se llama cuando el agente 1 alcanza al agente 2.
     /// Otorga recompensa, notifica al agente 2 y termina el episodio.
     /// </summary>
@@ -188,6 +150,9 @@ public class Agente1Script : Agent
         Debug.Log("Agente1 atrapó a Agente2");
         if (_agente2 != null && _agente2.TryGetComponent<Agente2Script>(out var script))
             script.NotificarAtrapado();
+        // Glow solo en el ambiente correspondiente
+        if (_gameManager != null)
+            _gameManager.OnAgente1Gano();
         EndEpisode();
     }
 
@@ -247,5 +212,12 @@ public class Agente1Script : Agent
         _episodesWon++;
     }
 
-    public static event System.Action OnAgente1Gano;
+    private void Update()
+    {
+        // Elimina este bloque, NO debe llamarse cada frame
+        /*
+        if (_gameManager != null)
+            _gameManager.OnAgente1Gano(); // o OnAgente2Gano() según corresponda
+        */
+    }
 }
